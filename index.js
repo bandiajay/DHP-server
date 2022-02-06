@@ -10,7 +10,7 @@ const { ReturnDocument } = require('mongodb');
 
 
 const connectionString = "mongodb+srv://admin:admin@cluster0.uliun.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const port = 3000;
+const port = process.env.PORT || 3000;
 const conn = new driver.Connection('https://test.ipdb.io/api/v1/');
 
 
@@ -21,7 +21,9 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once("open", function(){
    console.log("Connection to DB succeeded");
    intializeApp();
-
+    app.listen(port, () => {
+        console.log("server is up")
+    })
 });
 
 

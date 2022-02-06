@@ -21,9 +21,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once("open", function(){
    console.log("Connection to DB succeeded");
    intializeApp();
-   app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-  })
+
 });
 
 
@@ -110,7 +108,7 @@ async function intializeApp() {
     const holder  = new User({name: "patient", userType: "HOLDER", publicKey: holderKeypair.publicKey, privateKey: holderKeypair.privateKey });
 
     const verifierKeypair = createKeyPair();
-    const verifier  = new User({name: "CVS", userType: "VERIFIER", publicKey: verifierKeypair.publicKey, privateKey: verifierKeypair.privateKey });
+    const verifier  = new User({name: "Airport Management", userType: "VERIFIER", publicKey: verifierKeypair.publicKey, privateKey: verifierKeypair.privateKey });
 
     issuer.save( function(err,doc) { 
         if(err) return console.error(err); 

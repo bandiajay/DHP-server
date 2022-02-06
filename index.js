@@ -1,10 +1,12 @@
 const driver = require('bigchaindb-driver');
+var cors = require('cors')
 const base58 = require('bs58');
 const crypto = require('crypto');
 const { Ed25519Sha256 } = require('crypto-conditions');
 const mongoose = require("mongoose");
 var express = require('express');
 var app = express();
+app.use(cors())
 var cookieParser = require('cookie-parser');
 const { ReturnDocument } = require('mongodb');
 
@@ -30,6 +32,18 @@ db.once("open", function(){
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.get("/", (req,res) => {
+   return res.json({
+        "api": {
+            "create": "/create",
+            "get_transaction_details": "/transaction",
+            "issuer": "/issuer",
+            "holder": "/holder",
+            "verifier": "/verifer"
+        }
+    })
+})
 
 app.post('/create', (req, res) => {
     const fileHash = req.body.fileHash;

@@ -48,21 +48,24 @@ app.get("/", (req,res) => {
 app.post('/create', (req, res) => {
     const fileHash = req.body.fileHash;
     const metaData = req.body.metaData;
-    const userID = req.body.userID;
+    const receiverPublicKey = req.body.receiverPublicKey;
+    const receiverUserId = req.body.receiverUserId;
+    const senderUserID = req.body.senderUserID;
 
 
-    User.findById(userID, async (err, user) => {
-        let txObj = createTxObject({file: fileHash},metaData,user.publicKey);
+    User.findById(receiverUserId, async (err, user) => {
+        let txObj = createTxObject({file: fileHash},metaData,user.publicKey,receiverPublicKey);
         let signedTx = signTx(txObj, user.privateKey);
 
         let createdTx = await postTransaction(signedTx);
-        user.transactions = [createdTx.id];
+        user.transactions = [...user.transactions,createdTx.id];
         user.save(function (err) {
             if(err) { 
                 console.error('ERROR!');
                 res.send("Error")
             } else {
                 console.log("Created transaction successfully");
+                saveTxIdToIssuer(senderUserID, createdTx.id)
                 return res.send(createdTx)
             }
         });
@@ -102,6 +105,7 @@ app.get('/holder', (req,res) => {
     })
 })
 
+
 app.get('/verifier', (req,res) => {
     User.findOne({userType: "VERIFIER"}, (err, user) => {
         if(err) {
@@ -111,6 +115,31 @@ app.get('/verifier', (req,res) => {
             return res.send(user)
         }
     })
+})
+
+app.get("/allusers", (req, res) => {
+    User.find((err,users) => {
+        if(err) {
+            return res.send("Error")
+        }
+        return res.json(users)
+    })
+})
+
+app.get("/search/:id", (req,res) => {
+    let publicKey = req.params.id;
+    conn.searchMetadata(publicKey).then( txs => {
+        console.log(txs)
+       return res.json(txs)
+    })
+    .catch(err => {
+      return  res.send("Couldnt find any")
+    })
+})
+
+app.get("/reset", (req,res) => {
+    intializeApp();
+    return res.send("Success")
 })
 
 
@@ -132,7 +161,7 @@ async function intializeApp() {
     });
     holder.save( function(err,doc) { 
       if(err) return console.error(err); 
-      console.log("Holder saved") 
+      console.log("Holder saved", doc) 
     });
     verifier.save( function(err,doc) { 
       if(err) return console.error(err); 
@@ -146,12 +175,12 @@ function createKeyPair() {
     return new driver.Ed25519Keypair()
 }
 
-function createTxObject(message, metaData, senderPublicKey) {
+function createTxObject(message, metaData, senderPublicKey, receiverPublicKey) {
     const tx = driver.Transaction.makeCreateTransaction(
         message,
         { metaData: metaData },
         [driver.Transaction.makeOutput(
-            driver.Transaction.makeEd25519Condition(senderPublicKey))],
+            driver.Transaction.makeEd25519Condition(receiverPublicKey))],
             senderPublicKey);
 
         return tx;
@@ -181,4 +210,17 @@ userSchema);
 
 function getTransaction(id) {
             return conn.getTransaction(id)
+}
+
+function saveTxIdToIssuer(userID, txId) {
+    User.findById(userID, async (err, user) => {
+        user.transactions = [...user.transactions,txId];
+        user.save(function (err) {
+            if(err) { 
+                console.error('ERROR! while saving txID in iusser account');
+            } else {
+                console.log("saved transaction in issuer account successfully");
+            }
+        });
+    })
 }

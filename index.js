@@ -48,13 +48,12 @@ app.get("/", (req,res) => {
 app.post('/create', (req, res) => {
     const fileHash = req.body.fileHash;
     const metaData = req.body.metaData;
-    const receiverPublicKey = req.body.receiverPublicKey;
+    const senderPublicKey = req.body.senderPublicKey;
     const receiverUserId = req.body.receiverUserId;
     const senderUserID = req.body.senderUserID;
 
-
     User.findById(receiverUserId, async (err, user) => {
-        let txObj = createTxObject({file: fileHash},metaData,user.publicKey,receiverPublicKey);
+        let txObj = createTxObject({file: fileHash},metaData,senderPublicKey,user.publicKey);
         let signedTx = signTx(txObj, user.privateKey);
 
         let createdTx = await postTransaction(signedTx);

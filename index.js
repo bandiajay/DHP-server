@@ -56,8 +56,11 @@ app.post('/create', (req, res) => {
     User.findById(receiverUserId, async (err, user) => {
         let txObj = createTxObject({file: fileHash},metaData,senderPublicKey,user.publicKey);
         let signedTx = signTx(txObj, user.privateKey);
+        console.log(signedTx);
 
         let createdTx = await postTransaction(signedTx);
+
+        console.log("created tx", createdTx)
         user.transactions = [...user.transactions,createdTx.id];
         user.save(function (err) {
             if(err) { 

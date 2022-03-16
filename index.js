@@ -13,7 +13,7 @@ const { ReturnDocument } = require('mongodb');
 
 const connectionString = "mongodb+srv://admin:admin@cluster0.uliun.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const port = process.env.PORT || 3000;
-const conn = new driver.Connection('https://198.209.246.80/api/v1');
+const conn = new driver.Connection('https://test.ipdb.io/api/v1/');
 
 
 mongoose.connect(connectionString,{useNewUrlParser: true, useUnifiedTopology: true}); 

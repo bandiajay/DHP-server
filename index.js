@@ -28,6 +28,7 @@ db.once("open", function(){
     })
 });
 
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

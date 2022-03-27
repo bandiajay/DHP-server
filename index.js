@@ -102,10 +102,10 @@ app.get("/search/:id", (req,res) => {
     })
 })
 
-app.get("/reset", (req,res) => {
-    intializeApp();
-    return res.send("Success")
-})
+// app.get("/reset", (req,res) => {
+//     intializeApp();
+//     return res.send("Success")
+// })
 
 
 async function intializeApp() {

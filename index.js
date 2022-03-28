@@ -9,6 +9,12 @@ var app = express();
 app.use(cors())
 var cookieParser = require('cookie-parser');
 const { ReturnDocument } = require('mongodb');
+const authRoutes = require("./src/routes/auth")
+const holderRoutes = require("./src/routes/holder")
+const issuerRoutes = require("./src/routes/issuer")
+const verifierRoutes = require("./src/routes/verifier")
+const User = require("./src/models/user");
+
 
 
 const connectionString = "mongodb+srv://admin:admin@cluster0.uliun.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -16,33 +22,35 @@ const port = process.env.PORT || 3000;
 const conn = new driver.Connection('https://test.ipdb.io/api/v1/');
 
 
+// mongodb connection
 mongoose.connect(connectionString,{useNewUrlParser: true, useUnifiedTopology: true}); 
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:')); 
 db.once("open", function(){
    console.log("Connection to DB succeeded");
-   intializeApp();
+   //intializeApp();
     app.listen(port, () => {
         console.log("server is up")
     })
 });
 
-
+// middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// routes
+app.use("/api", authRoutes);
+app.use("/api", issuerRoutes);
+app.use("/api", holderRoutes);
+app.use("/api", verifierRoutes);
+
+
 app.get("/", (req,res) => {
    return res.json({
-        "api": {
-            "create": "/create",
-            "get_transaction_details": "/transaction",
-            "issuer": "/issuer",
-            "holder": "/holder",
-            "verifier": "/verifer"
-        }
-    })
+       "/api/signup": "Sign up as Holder, Verifer, Issuer"
+   })
 })
 
 app.post('/create', (req, res) => {
@@ -82,48 +90,6 @@ app.get('/transaction/:id', (req, res) => {
     })
 })
 
-app.get('/issuer', (req,res) => {
-    User.findOne({userType: "ISSUER"}, (err, user) => {
-        if(err) {
-          return  res.send("No user")
-        } else {
-            user.privateKey = undefined;
-            return res.send(user)
-        }
-    })
-})
-
-app.get('/holder', (req,res) => {
-    User.findOne({userType: "HOLDER"}, (err, user) => {
-        if(err) {
-          return  res.send("No user")
-        } else {
-            user.privateKey = undefined;
-            return res.send(user)
-        }
-    })
-})
-
-
-app.get('/verifier', (req,res) => {
-    User.findOne({userType: "VERIFIER"}, (err, user) => {
-        if(err) {
-          return  res.send("No user")
-        } else {
-            user.privateKey = undefined;
-            return res.send(user)
-        }
-    })
-})
-
-app.get("/allusers", (req, res) => {
-    User.find((err,users) => {
-        if(err) {
-            return res.send("Error")
-        }
-        return res.json(users)
-    })
-})
 
 app.get("/search/:id", (req,res) => {
     let publicKey = req.params.id;
@@ -136,14 +102,14 @@ app.get("/search/:id", (req,res) => {
     })
 })
 
-app.get("/reset", (req,res) => {
-    intializeApp();
-    return res.send("Success")
-})
+// app.get("/reset", (req,res) => {
+//     intializeApp();
+//     return res.send("Success")
+// })
 
 
 async function intializeApp() {
-    await User.deleteMany(); 
+    // await User.deleteMany(); 
 
     const issuerKeypair = createKeyPair();
     const issuer  = new User({name: "CVS", userType: "ISSUER", publicKey: issuerKeypair.publicKey, privateKey: issuerKeypair.privateKey });
@@ -195,16 +161,6 @@ function postTransaction(signedTx) {
 }
 
 
-const userSchema = mongoose.Schema({ 
-    name: String,
-    userType: String,
-    publicKey: String,
-    privateKey: String,
-    transactions: []
-   })
-
-const User = mongoose.model("User", 
-userSchema);
 
 
 function getTransaction(id) {

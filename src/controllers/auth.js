@@ -4,7 +4,8 @@ const { validationResult, body } = require("express-validator");
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const express_jwt = require("express-jwt")
-
+const driver = require('bigchaindb-driver');
+const crypto = require("crypto");
 
 exports.getUserById = (req, res, next, id) => {
     User.findById(id)
@@ -63,6 +64,10 @@ exports.signupUser = (req,res) => {
     })
   };
   // check user existence
+  const issuerKeypair = createKeyPair();
+  const payload = {...req.body,... issuerKeypair};
+  payload.role = "ISSUER";
+  payload["dhp_id"] = generateDHPId();
   const user =  new User(req.body);
   user.save((err, user) => {
     if(err) {
@@ -94,6 +99,14 @@ const removeSensitiveUserData = (user) => {
   user.salt = undefined;
   user.createdAt = undefined;
   user.updatedAt = undefined;
+}
+
+function createKeyPair() {
+  return new driver.Ed25519Keypair()
+}
+
+function generateDHPId() {
+  return `DHP-${crypto.randomUUID()}`;
 }
 
 

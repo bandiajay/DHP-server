@@ -107,6 +107,16 @@ app.get("/search/:id", (req,res) => {
     })
 })
 
+app.post("/email", (req,res) => {
+    console.log("request hit");
+   let reqBody = JSON.parse( Object.keys(req.body)[0]);
+   let responseObj = {email: reqBody.email};
+   console.log(responseObj)
+    return res.json(
+       responseObj
+    )
+})
+
 // app.get("/reset", (req,res) => {
 //     intializeApp();
 //     return res.send("Success")

@@ -46,7 +46,7 @@ exports.signin = (req, res) => {
         error: 'invalid password'
       })
     }
-    const privateKey = process.env.SEC_PASS || "dhp-gdp";
+    const privateKey = process.env.SEC_PASS ;
     const expiryDate = new Date().setHours(new Date().getHours() + 4);
     const token = jwt.sign({_id: user._id, expiry: Date.now()}, privateKey)
     const { _id, firstname, lastname, email, role } = user;

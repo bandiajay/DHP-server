@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const _ = require("lodash");
 const { validationResult, body } = require("express-validator");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4, v4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const express_jwt = require("express-jwt")
 const driver = require('bigchaindb-driver');
@@ -65,10 +65,12 @@ exports.signupUser = (req,res) => {
   };
   // check user existence
   const issuerKeypair = createKeyPair();
-  const payload = {...req.body,... issuerKeypair};
+  const payload = {...req.body};
+  payload["private_key"] = issuerKeypair.privateKey;
+  payload["public_key"] = issuerKeypair.publicKey;
   payload.role = "ISSUER";
   payload["dhp_id"] = generateDHPId();
-  const user =  new User(req.body);
+  const user =  new User(payload);
   user.save((err, user) => {
     if(err) {
       return res.send("Failed during creating User" + err)
@@ -106,7 +108,8 @@ function createKeyPair() {
 }
 
 function generateDHPId() {
-  return `DHP-${crypto.randomUUID()}`;
+  let id = uuidv4().split("-")[0];
+  return `DHP-${id}`;
 }
 
 

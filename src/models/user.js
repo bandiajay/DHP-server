@@ -9,6 +9,7 @@ var userSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+            unique: true
         },
 
         public_key: {
@@ -71,7 +72,7 @@ var userSchema = new mongoose.Schema(
             trim: true
         },
         gender: {
-            type: Boolean,
+            type: String,
             required: true
 
         },

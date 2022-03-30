@@ -23,49 +23,48 @@ var userSchema = new mongoose.Schema(
             trim: true,
         },
 
+        organization_name: {
+            type: String,
+            required: false
+        },
+
         first_name: {
             type: String,
-            required: true,
-
+            required: false,
             trim: true,
         },
         last_name: {
             type: String,
-            required: true,
+            required: false,
             trim: true,
         },
         middle_name: {
             type: String,
-
-            trim: true,
+            required: false,
+            trim: false,
         },
 
         phone_number: {
             type: String,
-
+            required: true,
             trim: true,
         },
         verification_id: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
         verification_type: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
         verification_issued_country: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
 
-        verification_issued_date: {
-            type: String,
-            required: true,
-            trim: true
-        },
         verification_issued_date: {
             type: String,
             required: true,
@@ -73,8 +72,7 @@ var userSchema = new mongoose.Schema(
         },
         gender: {
             type: String,
-            required: true
-
+            required: false
         },
         terms_condition: {
             type: Boolean,
@@ -88,8 +86,8 @@ var userSchema = new mongoose.Schema(
         },
 
         role: {
-            type: Array,
-            default: ["USER"],
+            type: String,
+            default: "",
         },
         salt: String,
         encryptedPassword: {

@@ -50,7 +50,7 @@ exports.signin = (req, res) => {
     const privateKey = process.env.SEC_PASS ;
     const expiryDate = new Date().setHours(new Date().getHours() + 4);
     const token = jwt.sign({_id: user._id, expiry: Date.now()}, privateKey)
-    const { _id, firstname, lastname, email, role } = user;
+    const { _id, firstname, lastname, email, role, dhp_id } = user;
     return res.json({ token, user: { _id, firstname, email, role, lastname } });
   })
 
@@ -63,13 +63,14 @@ exports.signupUser = (req,res) => {
       error: 'Bad Payload'
     })
   };
-  // check user existence
-  const issuerKeypair = createKeyPair();
   const payload = {...req.body};
-  payload["private_key"] = issuerKeypair.privateKey;
-  payload["public_key"] = issuerKeypair.publicKey;
-  payload.role = "ISSUER";
+
+  // generate public, private key
+  updatePayloadWithKeypair(payload);
+
+  // generate DHP ID
   payload["dhp_id"] = generateDHPId();
+
   const user =  new User(payload);
   user.save((err, user) => {
     if(err) {
@@ -103,14 +104,17 @@ const removeSensitiveUserData = (user) => {
   user.updatedAt = undefined;
 }
 
-function createKeyPair() {
-  return new driver.Ed25519Keypair()
+function updatePayloadWithKeypair(payload) {
+  let issuerKeypair = new driver.Ed25519Keypair();
+  payload["private_key"] = issuerKeypair.privateKey;
+  payload["public_key"] = issuerKeypair.publicKey;
 }
 
 function generateDHPId() {
   let id = uuidv4().split("-")[0];
   return `DHP-${id}`;
 }
+
 
 
   exports.activateUser = (req,res) => {

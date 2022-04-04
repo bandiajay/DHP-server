@@ -7,9 +7,17 @@ var transactionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    user_id: {
-      type: String,
-      maxlength: 32
+    issuer_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    holder_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    info: {
     }
   },
   { timestamps: true }

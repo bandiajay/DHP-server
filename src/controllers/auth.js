@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const express_jwt = require("express-jwt")
 const driver = require('bigchaindb-driver');
 const crypto = require("crypto");
+const { profile } = require("console");
 
 exports.getUserById = (req, res, next, id) => {
     User.findById(id)
@@ -19,6 +20,22 @@ exports.getUserById = (req, res, next, id) => {
         req.profile = user;
         next();
     });
+}
+
+exports.getUserByDHPId = (req,res,next,id) => {
+
+  User.find({dhp_id: id})
+  .exec( (err, results) => {
+    if (err || results.length == 0) {
+      return res.status(400).json({
+          error: "User not found"
+      });
+    }
+    let user = results[0]
+    let {first_name, last_name, phone_number,email,dhp_id,_id } = user;
+    req.patient = {first_name, last_name, phone_number,email,dhp_id,_id};
+    next();
+  })
 }
 
 
@@ -51,7 +68,8 @@ exports.signin = (req, res) => {
     const expiryDate = new Date().setHours(new Date().getHours() + 4);
     const token = jwt.sign({_id: user._id, expiry: Date.now()}, privateKey)
     const { _id, firstname, lastname, email, role, dhp_id } = user;
-    return res.json({ token, user: { _id, firstname, email, role, lastname } });
+    console.log(user)
+    return res.json({ token, user: { _id, firstname, email, role, lastname, dhp_id } });
   })
 
 }
@@ -85,6 +103,27 @@ exports.signupUser = (req,res) => {
 exports.isUserSignedIn = express_jwt({
   secret: process.env.SEC_PASS,algorithms: ['sha1', 'RS256', 'HS256']
 });
+
+exports.isIssuer = (req,res, next ) => {
+  if(req.profile.role === "ISSUER") {
+    next()
+  } else {
+    return res.status(401).json({
+      error: "UnAuthorized, user has no permission"
+  });
+  }
+}
+
+exports.isHolder = (req,res, next ) => {
+  if(req.profile.role === "HOLDER") {
+    next()
+  } else {
+    return res.status(401).json({
+      error: "UnAuthorized, user has no permission"
+  });
+  }
+}
+
 
 
 exports.isSessionValid = (req, res, next) => {

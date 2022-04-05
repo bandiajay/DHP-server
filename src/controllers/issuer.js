@@ -3,19 +3,36 @@ const User = require('../models/user');
 const TransactionNModel = require("../models/transaction");
 
 const { postTransaction, signTx, createTxObject } = require('../util/bigchaindb');
-
-
-
-
+const { addDataToIpfs } = require('../util/ipfs');
+const formidable = require("formidable")
+const fs = require('fs');
 
 exports.searchPatient = (req, res) => {
     return res.json(req.patient);
 }
 
 exports.newPatientReq = async (req, res ) => {
-    const fileHash = req.body.file;
-    const patientDHPId = req.body.holderDHPId;
     const issuer = req.profile;
+    const form = new formidable.IncomingForm();
+
+    form.parse(req, async (err, fields, files) => {
+        if (err) {
+            return res.send("failed while parsing form")
+        }
+        const testInfo = JSON.parse(fields.metaData);
+        const patientDHPId = fields.holderDHPId;
+        const file = files.file;
+        console.log(file)
+        let obj = {};
+        obj.content = fs.readFileSync(file.filepath);
+        obj.contentType = file.type;
+        console.log("sedning file to ipfs ...")
+        const fileHash = await addDataToIpfs(obj).catch(
+            err => {
+                return res.send("failed while saving file")
+            }
+        )
+   
     User.find({dhp_id: patientDHPId})
     .exec( async (err, results) => {
         if(err || results.length == 0) {
@@ -38,7 +55,7 @@ exports.newPatientReq = async (req, res ) => {
         console.log("tx commited");
 
         const transaction = new TransactionNModel({transaction_id: createdTx.id, issuer_id: issuer._id, holder_id: holder._id});
-        transaction.info = {... req.body.metaData}
+        transaction.info = {...testInfo}
         transaction.save( (err, tx) => {
             if(err) {
                 return res.status(500).json({
@@ -49,6 +66,7 @@ exports.newPatientReq = async (req, res ) => {
         })
 
      })
+    })
 }
 
 

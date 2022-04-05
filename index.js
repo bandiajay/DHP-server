@@ -9,6 +9,8 @@ const holderRoutes = require("./src/routes/holder");
 const issuerRoutes = require("./src/routes/issuer");
 const verifierRoutes = require("./src/routes/verifier");
 const specfile = require("./api_spec.json");
+const { connectToIPFS } = require('./src/util/ipfs');
+
 
 
 const connectionString = "mongodb+srv://admin:admin@cluster0.uliun.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -20,10 +22,11 @@ mongoose.connect(connectionString,{useNewUrlParser: true, useUnifiedTopology: tr
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:')); 
 db.once("open", function(){
-   console.log("Connection to DB succeeded");
+   console.log("🟢 Connection to DB succeeded");
    //intializeApp();
     app.listen(port, async() => {
-        console.log("server is up");
+        console.log("🟢 server is up and running at "+ port);
+        connectToIPFS()
     })
 });
 

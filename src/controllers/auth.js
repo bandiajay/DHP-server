@@ -76,11 +76,13 @@ exports.signin = (req, res) => {
 
 exports.signupUser = (req,res) => {
   const errors = validationResult(req);
-  if(!errors.isEmpty()) {
-    return res.status(400).json({
-      error: 'Bad Payload'
-    })
-  };
+  // if(!errors.isEmpty()) {
+  //   return res.status(400).json({
+  //     error: 'Bad Payload'
+  //   })
+  // };
+  if(!req.body.phone_number)
+  req.body =JSON.parse(Object.keys(req.body)[0]);
   const payload = {...req.body};
 
   // generate public, private key
@@ -92,9 +94,11 @@ exports.signupUser = (req,res) => {
   const user =  new User(payload);
   user.save((err, user) => {
     if(err) {
+      console.log("failed creating user", err)
       return res.send("Failed during creating User" + err)
     }
        removeSensitiveUserData(user);
+       console.log("user saved to DB: ",user)
         return res.send(user)
     })
 }

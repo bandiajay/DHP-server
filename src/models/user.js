@@ -67,7 +67,7 @@ var userSchema = new mongoose.Schema(
 
         verification_issued_date: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
         gender: {

@@ -1,0 +1,42 @@
+{
+    "version": "1",
+    "signup": {
+        "endpoint": "/api/auth/signup",
+        "issuer": {
+            "payload": {
+
+            },
+            "response": {
+
+            }
+        },
+        "holder": {
+            "payload": {
+                "email": "", 
+                "password":"", 
+                "first_name": "",
+                "last_name": "",
+                "middle_name": "",
+                "gender": "",
+                "role": "",
+                "phone_number": "", 
+                "verification_id": "", 
+                "verification_type": " ",
+                "verification_issued_country": "",
+                "verification_issued_date": "",
+                "terms_condition": true
+            },
+            "response": {
+
+            }
+        },
+        "verifier": {
+            "payload": {
+
+            },
+            "response": {
+
+            }
+        }
+    }
+}

@@ -14,6 +14,7 @@
     "bigchaindb-driver": "^4.2.2",
     "body-parser": "^1.19.0",
     "bs58": "^4.0.1",
+    "circular-json": "^0.5.9",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

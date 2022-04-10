@@ -2,7 +2,7 @@ const { getTransaction, searchMetaData } = require("../util/bigchaindb");
 
 const TransactionNModel = require("../models/transaction");
 const { getDataFromIPFS } = require("../util/ipfs");
-
+var CircularJSON = require('circular-json');
 
 exports.getTransactionById = (req, res) => {
     let txId = req.params.txId;
@@ -11,8 +11,7 @@ exports.getTransactionById = (req, res) => {
         getDataFromIPFS(tx.asset.data.file)
         .then(
             response => {
-                console.log(response)
-                return res.send(response.data)
+                return res.send(CircularJSON.stringify(response))
             }
         )
         .catch( error => {

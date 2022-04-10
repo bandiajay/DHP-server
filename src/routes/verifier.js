@@ -6,7 +6,7 @@ const { getTransactionById } = require("../controllers/holder");
 
 
 router.param("userId", getUserById);
-router.get('/transaction/:txId/:userId', isUserSignedIn, isSessionValid, isVerifier , getTransactionById);
+router.get('/transaction/:txId/:userId', isUserSignedIn, isSessionValid , getTransactionById);
 
 
 module.exports = router;

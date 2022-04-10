@@ -1,13 +1,25 @@
 const { getTransaction, searchMetaData } = require("../util/bigchaindb");
 
 const TransactionNModel = require("../models/transaction");
+const { getDataFromIPFS } = require("../util/ipfs");
 
 
 exports.getTransactionById = (req, res) => {
     let txId = req.params.txId;
     getTransaction(txId).then( tx => {
         console.log(tx.asset);
-        return res.json(tx.asset)
+        getDataFromIPFS(tx.asset.data.file)
+        .then(
+            response => {
+                console.log(response)
+                return res.send(response.data)
+            }
+        )
+        .catch( error => {
+            console.log(error)
+            return res.status(500).json({message: "Something went wrong while fetching file"})
+        })
+       
     })
     .catch( err => {
         res.send(err)

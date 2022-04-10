@@ -11,7 +11,9 @@ exports.getTransactionById = (req, res) => {
         getDataFromIPFS(tx.asset.data.file)
         .then(
             response => {
-                return res.send(CircularJSON.stringify(response))
+                res.setHeader('content-type', 'application/pdf');
+            
+                return res.send(response.data)
             }
         )
         .catch( error => {

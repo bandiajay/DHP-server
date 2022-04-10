@@ -67,9 +67,9 @@ exports.signin = (req, res) => {
     const privateKey = process.env.SEC_PASS ;
     const expiryDate = new Date().setHours(new Date().getHours() + 4);
     const token = jwt.sign({_id: user._id, expiry: Date.now()}, privateKey)
-    const { _id, firstname, lastname, email, role, dhp_id } = user;
+    const { _id, first_name, last_name, email, role, dhp_id, organization_name } = user;
     console.log(user)
-    return res.json({ token, user: { _id, firstname, email, role, lastname, dhp_id } });
+    return res.json({ token, user: { _id, first_name, last_name, email, role,organization_name , dhp_id } });
   })
 
 }
@@ -128,6 +128,16 @@ exports.isHolder = (req,res, next ) => {
   }
 }
 
+exports.isVerifier = (req,res, next ) => {
+  if(req.profile.role === "VERIFIER") {
+    next()
+  } else {
+    return res.status(401).json({
+      error: "UnAuthorized, user has no permission"
+  });
+  }
+}
+
 
 
 exports.isSessionValid = (req, res, next) => {
@@ -145,6 +155,8 @@ const removeSensitiveUserData = (user) => {
   user.salt = undefined;
   user.createdAt = undefined;
   user.updatedAt = undefined;
+  user.private_key = undefined;
+  user.public_key = undefined;
 }
 
 function updatePayloadWithKeypair(payload) {

@@ -44,11 +44,14 @@ exports.getUserByDHPId = (req,res,next,id) => {
 
 exports.signin = (req, res) => {
   const errors = validationResult(req);
-  if(!errors.isEmpty()) {
-    return res.status(400).json({
-      error: 'Bad Payload'
-    })
-  };
+  // if(!errors.isEmpty()) {
+  //   return res.status(400).json({
+  //     error: 'Bad Payload'
+  //   })
+  // };
+  if(!req.body.email)
+    req.body =JSON.parse(Object.keys(req.body)[0]);
+
   const {email, password} = req.body;
   User.findOne({email})
   .exec((err, user) => {

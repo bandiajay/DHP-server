@@ -22,7 +22,6 @@ exports.newPatientReq = async (req, res ) => {
         const testInfo = JSON.parse(fields.metaData);
         const patientDHPId = fields.holderDHPId;
         const file = files.file;
-        console.log(file)
         let obj = {};
         obj.content = fs.readFileSync(file.filepath);
         obj.contentType = file.type;
@@ -43,7 +42,7 @@ exports.newPatientReq = async (req, res ) => {
        const holder = results[0];
        const metaData = holder.public_key;
         let txObj = createTxObject({file: fileHash},metaData,issuer.public_key,holder.public_key);
-        console.log(issuer)
+        console.log(txObj)
         let signedTx = signTx(txObj, issuer.private_key);
         console.log("signed tx: "+ signedTx);
         let createdTx = await postTransaction(signedTx).catch( err => {

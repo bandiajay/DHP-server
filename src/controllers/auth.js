@@ -71,7 +71,6 @@ exports.signin = (req, res) => {
     const expiryDate = new Date().setHours(new Date().getHours() + 4);
     const token = jwt.sign({_id: user._id, expiry: Date.now()}, privateKey)
     const { _id, first_name, last_name, email, role, dhp_id, organization_name } = user;
-    console.log(user)
     return res.json({ token, user: { _id, first_name, last_name, email, role,organization_name , dhp_id } });
   })
 
@@ -158,8 +157,6 @@ const removeSensitiveUserData = (user) => {
   user.salt = undefined;
   user.createdAt = undefined;
   user.updatedAt = undefined;
-  user.private_key = undefined;
-  user.public_key = undefined;
 }
 
 function updatePayloadWithKeypair(payload) {

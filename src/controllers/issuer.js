@@ -17,6 +17,7 @@ exports.newPatientReq = async (req, res ) => {
 
     form.parse(req, async (err, fields, files) => {
         if (err) {
+            console.log(err)
             return res.send("failed while parsing form")
         }
         const testInfo = JSON.parse(fields.metaData);

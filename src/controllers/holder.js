@@ -55,7 +55,7 @@ exports.getAllTransactions = (req,res) => {
 exports.getIPFSURL = (req,res) => {
     let txId = req.params.txId;
     getTransaction(txId).then( tx => {
-        const url = `https://${tx.asset.data.file}.ipfs.infura-ipfs.io`;
+        const url = `https://ipfs.infura.io/ipfs/${tx.asset.data.file}`;
         return res.status(200).json({url});
     })
     .catch( err => {
